@@ -7,6 +7,7 @@ categories, and returns per-mention topic labels with sentiment overlay.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -256,7 +257,9 @@ def keyword_topic_classify(text: str) -> TopicResult:
         score = 0
         matched_kw = []
         for kw in keywords:
-            if kw.lower() in text_lower:
+            # Match at the start of a word, so "thin" doesn't match "something"
+            # while "fabric" still matches "fabrics"
+            if re.search(r"\b" + re.escape(kw.lower()), text_lower):
                 score += 1
                 matched_kw.append(kw)
         if score > 0:
